@@ -1,6 +1,11 @@
 import discord, random
 from discord.ext import commands
 
+def getKey():
+    keyFile = open("apiKey.txt")
+    key = keyFile.readline()
+    keyFile.close()
+    return key
 
 bot = commands.Bot(command_prefix = ';', intents = discord.Intents.default()) #sets up the bot, names it 'bot', and sets the command prefix
 
@@ -55,14 +60,6 @@ class Misc(commands.Cog):
         await ctx.send('Numbers rolled: '+numbers )
         """result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))"""
         await ctx.send('Total: '+str(result))
-        
-        
-
-
-def getKey():
-    with open("apiKey.txt") as keyFile:
-        key = keyFile.readlines()
-    return key
 
 
 bot.add_cog(Misc(bot))
