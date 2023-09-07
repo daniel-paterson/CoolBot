@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import CommandNotFound
 
 from general_cog import general_cog
 from music_cog import music_cog
@@ -22,7 +21,7 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, CommandNotFound):
+    if isinstance(error, commands.CommandNotFound):
        await ctx.send("I don't know what that means")
 
 
@@ -32,10 +31,5 @@ def getKey():
     with open("apiKey.txt") as keyFile:
         key = keyFile.readline()
     return key
-
-
-
-
-
 
 bot.run(getKey())

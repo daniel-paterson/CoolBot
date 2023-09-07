@@ -7,6 +7,7 @@ class ttrpg_cog(commands.Cog):
     
     @commands.command() #used for ttrpgs and other stuff like that. TODO: add support for addition, ie "2d10 + 2" or "1d6 + 3d4 + 2"
     async def roll(ctx, dice: str):
+
         try:
             rolls, limit = map(int, dice.split('d'))
             if (rolls < 1 or limit < 1):
@@ -23,5 +24,5 @@ class ttrpg_cog(commands.Cog):
             n = random.randint(1, limit)
             numbers += (str(n)+ '  ')
             result += n
-        
+
         await ctx.send(f'Numbers rolled: {numbers}\nTotal: {result}')
