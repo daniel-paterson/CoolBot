@@ -12,7 +12,7 @@ bot = commands.Bot(command_prefix = ';', intents=intents)
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
-       await ctx.send("Yeah, I don't know what that means")
+       await ctx.send("I don't know what that means")
 
 #prints in the terminal when the bot is online
 @bot.event
@@ -22,20 +22,23 @@ async def on_ready():
 
 
 @bot.command()
-async def test(self, ctx, *args):
+async def test(ctx, *args):
     userSaid = " ".join(args)
-    await ctx.send(f"You said {userSaid}")
+    await ctx.send(f"{ctx.message.author} said {userSaid}")
 
 @bot.command()
-@commands.is_owner()
-async def shutdown(self, ctx):
-    await ctx.bot.logout()
+async def shutdown(ctx):
+    if await bot.is_owner(ctx.message.author):
+        await ctx.send("Logging off...")
+        await bot.close()
+    else:
+        await ctx.send("Only the bot owner can use this command")
 
 
 
 
-@commands.command()
-async def roll(self, ctx, dice: str):
+@bot.command()
+async def roll(ctx, dice: str):
     try:
         rolls, limit = map(int, dice.split('d'))
         if (rolls < 1 or limit < 1):
