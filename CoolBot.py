@@ -21,23 +21,23 @@ async def on_ready():
 
 
 
-@bot.command()
+@bot.command() #useful for bug testing
 async def test(ctx, *args):
     userSaid = " ".join(args)
     await ctx.send(f"{ctx.message.author} said {userSaid}")
 
-@bot.command()
+@bot.command() #turns off the bot, only usable by me
 async def shutdown(ctx):
     if await bot.is_owner(ctx.message.author):
         await ctx.send("Logging off...")
         await bot.close()
     else:
-        await ctx.send("Only the bot owner can use this command")
+        await ctx.send("Only the bot owner can use this command") #note to self, figure out the other better way of checking if the owner is sending the message
 
 
 
 
-@bot.command()
+@bot.command() #used for ttrpgs and other stuff like that. TODO: add support for addition, ie "2d10 + 2" or "1d6 + 3d4 + 2"
 async def roll(ctx, dice: str):
     try:
         rolls, limit = map(int, dice.split('d'))
