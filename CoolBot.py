@@ -2,11 +2,15 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
+from general_cog import general_cog
+from music_cog import music_cog
+from ttrpg_cog import ttrpg_cog
+
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-#sets up the bot, names it 'bot', and sets the command prefix
+
 bot = commands.Bot(command_prefix = '/', intents=intents)
 
 @bot.event
@@ -14,16 +18,22 @@ async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
        await ctx.send("I don't know what that means")
 
-#prints in the terminal when the bot is online
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
 
-
-def getKey(): #for obvious reasons, the api key is not stored on git
+#for obvious reasons, the api key is not stored on git
+def getKey():
     with open("apiKey.txt") as keyFile:
         key = keyFile.readline()
     return key
+
+
+bot.add_cog(general_cog(bot))
+bot.add_cog(music_cog(bot))
+bot.add_cog(ttrpg_cog(bot))
+
+
 
 bot.run(getKey())

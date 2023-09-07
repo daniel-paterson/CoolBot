@@ -21,6 +21,7 @@ Music commands:
 ```
 """
 
+
     @commands.HelpCommand()
     async def help(self, ctx, arg):
         if arg == None:
