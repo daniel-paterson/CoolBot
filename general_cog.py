@@ -27,3 +27,17 @@ Music commands:
             await ctx.send(self.helpMessage)
         else:
             await ctx.send(ctx.send_command_help(arg))
+    
+
+    @commands.command() #turns off the bot, only usable by me
+    async def shutdown(self, ctx):
+        if await self.is_owner(ctx.message.author):
+            await ctx.send("Logging off...")
+            await self.close()
+        else:
+            await ctx.send("Only the bot owner can use this command") #note to self, figure out the other better way of checking if the owner is sending the message
+    
+    @commands.command() #useful for bug testing
+    async def test(self, ctx, *args):
+        userSaid = " ".join(args)
+        await ctx.send(f"{ctx.message.author} said {userSaid}")
