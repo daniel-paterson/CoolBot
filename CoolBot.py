@@ -1,129 +1,68 @@
-import discord, pafy, asyncio, random
+import discord, random
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 
-bot = commands.Bot(command_prefix = '$') #sets up the bot, names it 'bot', and sets the command prefix
 
-class WrongChannelError(commands.CheckFailure): #custom error for trying to call the bot in the wrong channel
-    pass
-    
-def in_Bot_Commands(): #checks to make sure the command is being run in the correct channel
-    async def predicate(ctx):
-        if ctx.channel.name != 'bot-commands':
-            raise WrongChannelError("Sorry, thats the wrong channel!") #maybe add a way to display who made the bad call?
-        return True
-    return commands.check(predicate)
+intents = discord.Intents.default()
+intents.message_content = True
 
-@bot.event #prints 'online' in the command line once the bot comes online
+#sets up the bot, names it 'bot', and sets the command prefix
+bot = commands.Bot(command_prefix = ';', intents=intents)
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+       await ctx.send("I don't know what that means")
+
+#prints in the terminal when the bot is online
+@bot.event
 async def on_ready():
-    print('Logged in as {0} ({0.id})'.format(bot.user))
-    print('------')
-        
-        
-        
+    print(f'Logged in as {bot.user}')
+
+
+
+@bot.command() #useful for bug testing
+async def test(ctx, *args):
+    userSaid = " ".join(args)
+    await ctx.send(f"{ctx.message.author} said {userSaid}")
+
+@bot.command() #turns off the bot, only usable by me
+async def shutdown(ctx):
+    if await bot.is_owner(ctx.message.author):
+        await ctx.send("Logging off...")
+        await bot.close()
+    else:
+        await ctx.send("Only the bot owner can use this command") #note to self, figure out the other better way of checking if the owner is sending the message
+
+
+
+
+@bot.command() #used for ttrpgs and other stuff like that. TODO: add support for addition, ie "2d10 + 2" or "1d6 + 3d4 + 2"
+async def roll(ctx, dice: str):
+    try:
+        rolls, limit = map(int, dice.split('d'))
+        if (rolls < 1 or limit < 1):
+            raise Exception
+        if (rolls > 100 or limit > 100):
+            await ctx.send('For the sake of keeping things running smoothly, please don\'t use numbers greater than 100.')
+    except Exception:
+        await ctx.send('Format has to be in NdM where N and M are non-zero integers.')
+        return
+
+    numbers = ''
+    result = 0
+    for r in range(rolls):
+        n = random.randint(1, limit)
+        numbers += (str(n)+ '  ')
+        result += n
     
-class Misc(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        
-        
-    @commands.command() #provides diagnostic data
-    async def hello(self, ctx):
-        await ctx.send('Hello!')
-        
-        
-    @commands.command() #rolls some dice
-    @in_Bot_Commands()
-    async def roll(self, ctx, dice: str):
-        try:
-            rolls, limit = map(int, dice.split('d'))
-            if (rolls < 1 or limit < 1):
-                raise Exception
-            if (rolls > 100 or limit > 100):
-                await ctx.send('For the sake of keeping things running smoothly, please don\'t use numbers greater than 100.')
-        except Exception:
-            await ctx.send('Format has to be in NdM where N and M are non-zero integers.')
-            return
-
-        numbers = ''
-        result = 0
-        for r in range(rolls):
-            n = random.randint(1, limit)
-            numbers += (str(n)+ '  ')
-            result += n
-        
-        await ctx.send('Numbers rolled: '+numbers )
-        """result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))"""
-        await ctx.send('Total: '+str(result))
-        
-        
-
-class AudioSorce(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        
-    
-    @commands.command() 
-    @in_Bot_Commands()
-    async def getSource(self, ctx, url):
-        try:
-            video = pafy.new(url)
-        except ValueError:
-            await ctx.send("Error: Not a valid link")
-        
-        audio = video.getbestaudio()
-        
-        
-            
-
-class Player(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        
-    @commands.command()
-    @in_Bot_Commands()
-    async def join(self, ctx): #joins the vc that the person who made the command is currently in
-        
-        try:
-            channel = ctx.author.voice.channel
-            
-            if ctx.voice_client is not None:
-                return await ctx.voice_client.move_to(channel)
-
-            await channel.connect()
-            
-        except AttributeError:
-            await ctx.send("Enter the voice chat you want me to join first.")
-        
-    @commands.command()
-    @in_Bot_Commands()
-    async def leave(self, ctx): #leaves the current vc
-        
-        if ctx.voice_client is not None:
-            await ctx.disconnect()
-        else:
-            await ctx.send("I need to be in a voice chat before I can leave one")
-            
-            
-    """@commands.command()
-    @in_Bot_Commands()
-    async def p(self, ctx, *, url): #streams audio from a url
-        
-        
-        async with ctx.typing():
-            
-            
-        await ctx.send('Now playing')"""
+    await ctx.send(f'Numbers rolled: {numbers}\nTotal: {result}')
 
 
-def getToken():
+
+def getKey(): #for obvious reasons, the api key is not stored on git
     with open("apiKey.txt") as keyFile:
-        key = keyFile.readlines()
+        key = keyFile.readline()
     return key
 
-
-bot.add_cog(Misc(bot))
-bot.add_cog(AudioSorce(bot))
-bot.add_cog(Player(bot))
-
-bot.run(getToken()) #runs the bot, establishing a link with Discord using the API token. Needs to reman the final line in the script
-#TOKEN NEEDS TO REMAIN A SECRET, REGENERATE ASAP IF LEAKED!!!
+bot.run(getKey())
