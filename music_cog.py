@@ -2,6 +2,9 @@ import discord
 from discord import commands
 from youtube_dl import YoutubeDL
 
+#number of songs displayed when the queue command is used
+queueDisplayLength = 4
+
 class music_cog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -60,7 +63,7 @@ class music_cog(commands.Cog):
 
 
 
-    @commands.command(name="play", alieses=["p"] help="Plays a song based on a given url or search term(s)")
+    @commands.command(name="play", alieses=["p"], help="Plays a song based on a given url or search term(s)")
     async def play(self, ctx, *args):
         query = "".join(args) #grab the key words that the user is using, and put them in a string
 
@@ -91,4 +94,39 @@ class music_cog(commands.Cog):
 
     @commands.command(name="resume", alieses=["r"], help="Unpauses the bot and resumes playing the current song")
     async def resume(self, ctx, *args):
-        if self.isPaused
+        if self.isPaused:
+            self.isPlaying = True
+            self.isPaused = False
+            self.vc.resume()
+
+    @commands.command(name="skip", alieses=["s"], help="Skips the currently playing song")
+    async def skip(self, ctx, *args):
+        if self.vc != None and self.vc:
+            self.vc.stop()
+            await self.play_music(ctx)
+
+    @commands.command(name="queue", alieses=["q"], help=f"Displays the next {queueDisplayLength} songs in the queue")
+    async def queue(self, ctx): #TODO update to add link functionality instead of just names
+        out = ""
+
+        for i in range(0, len(self.musicQueue)):
+            if i > queueDisplayLength: break
+            out += self.musicQueue[i][0]['title']+'\n'
+        
+        if out != "":
+            await ctx.send(out)
+        else:
+            await ctx.send("Queue is empty")
+    
+    @commands.command(name="clear", alieses=["c","trash"], help="Stops the current song and clears the queue")
+    async def clear(self, ctx, *args):
+        if self.vc != None and self.isPlaying:
+            self.vc.stop()
+        self.musicQueue = []
+        await ctx.send("Music queue cleared")
+    
+    @commands.command(name="leave", alieses=["disconnect","l","d"], help="Kicks the bot from the voice channel")
+    async def leave(self, ctx,):
+        self.isPlaying = False
+        self.isPaused = False
+        await self.vc.disconnect()
