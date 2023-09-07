@@ -1,5 +1,5 @@
 import discord
-from discord import commands
+from discord.ext import commands
 from youtube_dl import YoutubeDL
 
 #number of songs displayed when the queue command is used

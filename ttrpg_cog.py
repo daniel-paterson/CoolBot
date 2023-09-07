@@ -1,5 +1,5 @@
 import discord, random
-from discord import commands
+from discord.ext import commands
 
 class ttrpg_cog(commands.Cog):
     def __init__(self, bot):
