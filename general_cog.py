@@ -22,12 +22,12 @@ Music commands:
 """
 
 
-    @commands.HelpCommand()
-    async def help(self, ctx, arg):
-        if arg == None:
-            await ctx.send(self.helpMessage)
-        else:
-            await ctx.send(ctx.send_command_help(arg))
+    # @commands.HelpCommand()
+    # async def help(self, ctx, arg):
+    #     if arg == None:
+    #         await ctx.send(self.helpMessage)
+    #     else:
+    #         await ctx.send(ctx.send_command_help(arg))
     
 
     @commands.command() #turns off the bot, only usable by me

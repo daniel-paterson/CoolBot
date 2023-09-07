@@ -24,7 +24,7 @@ class music_cog(commands.Cog):
                 info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0] #search for a video (no download)
             except Exception:
                 return False
-        return {'source': info['formats'[0]['url']], 'title': info['title']}
+        return {'source': info['formats'][0]['url'], 'title': info['title']}
     
     def play_next(self): #plays the next song in queue
         if len(self.musicQueue) > 0: #if there is still music in the queue...
