@@ -7,7 +7,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 #sets up the bot, names it 'bot', and sets the command prefix
-bot = commands.Bot(command_prefix = ';', intents=intents)
+bot = commands.Bot(command_prefix = '/', intents=intents)
 
 @bot.event
 async def on_command_error(ctx, error):
