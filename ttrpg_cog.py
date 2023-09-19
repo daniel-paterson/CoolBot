@@ -1,7 +1,7 @@
-import discord, random
+import random
 from discord.ext import commands
 
-class ttrpg_cog(commands.Cog):
+class ttrpgCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
@@ -26,3 +26,6 @@ class ttrpg_cog(commands.Cog):
             result += n
 
         await ctx.send(f'Numbers rolled: {numbers}\nTotal: {result}')
+
+async def setup(bot):
+    await bot.add_cog(ttrpgCog(bot=bot))
