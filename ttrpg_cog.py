@@ -4,6 +4,16 @@ from discord.ext import commands
 class ttrpgCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    
+    # doing something when the cog gets loaded
+    async def cog_load(self):
+        print(f"{self.__class__.__name__} loaded!")
+
+    # doing something when the cog gets unloaded
+    async def cog_unload(self):
+        print(f"{self.__class__.__name__} unloaded!")
+
     
     @commands.command() #used for ttrpgs and other stuff like that. TODO: add support for addition, ie "2d10 + 2" or "1d6 + 3d4 + 2"
     async def roll(ctx, dice: str):

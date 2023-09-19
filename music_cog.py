@@ -5,7 +5,7 @@ from youtube_dl import YoutubeDL
 #number of songs displayed when the queue command is used
 queueDisplayLength = 4
 
-class music_cog(commands.Cog):
+class MusicCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -17,6 +17,14 @@ class music_cog(commands.Cog):
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
         self.vc = None
+
+    # doing something when the cog gets loaded
+    async def cog_load(self):
+        print(f"{self.__class__.__name__} loaded!")
+
+    # doing something when the cog gets unloaded
+    async def cog_unload(self):
+        print(f"{self.__class__.__name__} unloaded!")
 
     def search_yt(self, item): #searches for a youtube video and returns dict with url and title
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
@@ -130,3 +138,6 @@ class music_cog(commands.Cog):
         self.isPlaying = False
         self.isPaused = False
         await self.vc.disconnect()
+
+async def setup(bot):
+    await bot.add_cog(MusicCog(bot=bot))
