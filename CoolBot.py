@@ -1,29 +1,26 @@
 import discord
-from discord.ext import commands
+from discord import commands
 
-from general_cog import general_cog
-from music_cog import music_cog
-from ttrpg_cog import ttrpg_cog
+class bot(commands.Bot):
+    def __init__(self):
+        super().__init__(
+            command_prefix = ";",
+            intents = discord.Intents.all()
+        )
+    
+    async def setup_hook(self):
+        await self.load_extention("general_cog")
 
 
-intents = discord.Intents.default()
-intents.message_content = True
-
-
-bot = commands.Bot(command_prefix = ';', intents=intents)
 
 @bot.event
 async def on_ready():
-    await bot.add_cog(general_cog(bot))
-    await bot.add_cog(music_cog(bot))
-    await bot.add_cog(ttrpg_cog(bot))
     print(f'Logged in as {bot.user}')
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
        await ctx.send("I don't know what that means")
-
 
 
 #for obvious reasons, the api key is not stored on git
