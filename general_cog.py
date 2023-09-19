@@ -1,34 +1,20 @@
-import discord
 from discord.ext import commands
 
-class general_cog(commands.Cog):
+class GeneralCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.helpMessage = """
-```
-General Commands:
-/help - Displays all avalible commands
+    @commands.command(name="ping")
+    async def pingcmd(self, ctx):
+        await ctx.send(ctx.author.mention)
 
-Music commands:
-/p <search terms> - Searches for a song and plays it in a voice channel
-/q - Displays the current song queue
-/skip - Skips the currently playing song
-/clear - Stops the current song and clears the queue
-/leave - Kicks the bot from the voice channel
-/pause - Pauses the current song, or resumes it if already paused
-/resume - Resumes the current song
-```
-"""
+    # doing something when the cog gets loaded
+    async def cog_load(self):
+        print(f"{self.__class__.__name__} loaded!")
 
-
-    # @commands.HelpCommand()
-    # async def help(self, ctx, arg):
-    #     if arg == None:
-    #         await ctx.send(self.helpMessage)
-    #     else:
-    #         await ctx.send(ctx.send_command_help(arg))
-    
+    # doing something when the cog gets unloaded
+    async def cog_unload(self):
+        print(f"{self.__class__.__name__} unloaded!")
 
     @commands.command() #turns off the bot, only usable by me
     async def shutdown(self, ctx):
@@ -38,7 +24,7 @@ Music commands:
         else:
             await ctx.send("Only the bot owner can use this command") #note to self, figure out the other better way of checking if the owner is sending the message
     
-    @commands.command() #useful for bug testing
-    async def test(self, ctx, *args):
-        userSaid = " ".join(args)
-        await ctx.send(f"{ctx.message.author} said {userSaid}")
+    
+
+async def setup(bot):
+    await bot.add_cog(GeneralCog(bot=bot))
