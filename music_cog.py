@@ -26,6 +26,7 @@ class MusicCog(commands.Cog):
     async def cog_unload(self):
         print(f"{self.__class__.__name__} unloaded!")
 
+
     def search_yt(self, item): #searches for a youtube video and returns dict with url and title
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             try:
@@ -97,8 +98,10 @@ class MusicCog(commands.Cog):
             self.isPlaying = False
             self.isPaused = True
             self.vc.pause()
+            await ctx.message.add_reaction("⏸️")
         elif self.isPaused:
             self.vc.resume()
+            await ctx.message.add_reaction("▶️")
 
     @commands.command(name="resume", alieses=["r"], help="Unpauses the bot and resumes playing the current song")
     async def resume(self, ctx, *args):
@@ -106,12 +109,14 @@ class MusicCog(commands.Cog):
             self.isPlaying = True
             self.isPaused = False
             self.vc.resume()
+            await ctx.message.add_reaction("▶️")
 
     @commands.command(name="skip", alieses=["s"], help="Skips the currently playing song")
     async def skip(self, ctx, *args):
         if self.vc != None and self.vc:
             self.vc.stop()
             await self.play_music(ctx)
+            await ctx.message.add_reaction("⏩")
 
     @commands.command(name="queue", alieses=["q"], help=f"Displays the next {queueDisplayLength} songs in the queue")
     async def queue(self, ctx): #TODO update to add link functionality instead of just names

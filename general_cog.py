@@ -8,6 +8,7 @@ class GeneralCog(commands.Cog):
     @commands.command(name="ping")
     async def pingcmd(self, ctx):
         await ctx.send(f"{ctx.author.mention} pong!")
+        await ctx.message.add_reaction("👋")
 
 
     # doing something when the cog gets loaded
