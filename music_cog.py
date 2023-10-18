@@ -55,17 +55,44 @@ class MusicCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+        self.musicQueue = []
+
+
+
+    #
     #non-command functions
-
-    async def streamAudio(self, ctx, url):
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+    #
         
-        await ctx.send(f'Now playing: {player.title}')
+    async def playNext(self, ctx):
+        if len(self.musicQueue) > 0: #if there is music in the queue...
 
 
+            url = self.musicQueue.pop() #remove the next song from the queue and store it
+
+            async with ctx.typing(): #play the music
+                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                ctx.voice_client.play(player, after=await self.playNext(ctx)) #after playing, run this function again
+            
+            await ctx.send(f'Now playing: {player.title}')
+
+        else: #if the queue is empty...
+            await ctx.send("Reached end of music queue")
+
+
+
+    #
     #commands
+    #
+
+    @commands.command()
+    async def play(self, ctx, *, url):
+        self.musicQueue.append(url) #add the song to the queue
+        await ctx.message.add_reaction("✅")
+
+        if not ctx.voice_client.is_playing(): #if we aren't already playing stuff, start playing stuff
+            await self.playNext(ctx)
+
+
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
@@ -74,14 +101,6 @@ class MusicCog(commands.Cog):
             return await ctx.voice_client.move_to(channel)
 
         await channel.connect()
-
-
-
-    @commands.command()
-    async def play(self, ctx, *, url):
-        await self.streamAudio(ctx, url)
-
-        
 
 
     # @commands.command()
@@ -102,6 +121,11 @@ class MusicCog(commands.Cog):
         await ctx.voice_client.disconnect()
 
 
+
+    #
+    #other
+    #
+
     @play.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
@@ -112,6 +136,13 @@ class MusicCog(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+    
+
+    async def cog_load(self):
+        print(f"{self.__class__.__name__} loaded!")
+
+    async def cog_unload(self):
+        print(f"{self.__class__.__name__} unloaded!")
 
 
 
