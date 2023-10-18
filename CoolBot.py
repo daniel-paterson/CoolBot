@@ -11,7 +11,8 @@ class bot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension("general_cog")
         await self.load_extension("ttrpg_cog")
-        await self.load_extension("music_cog")
+        #await self.load_extension("music_cog")
+        await self.load_extension("music_cog copy")
 
 
 #for obvious reasons, the api key is not stored on git
