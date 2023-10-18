@@ -95,10 +95,10 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def join(self, ctx):
-        channel = ctx.message.author.voice.channel
+        voiceState = ctx.message.author.voice
 
-        if channel is not None:
-            await channel.connect()
+        if not voiceState is None:
+            await voiceState.channel.connect()
         else:
             await ctx.send("You must connect to a voice channel first")
 
