@@ -94,13 +94,15 @@ class MusicCog(commands.Cog):
 
 
     @commands.command()
-    async def join(self, ctx, *, channel: discord.VoiceChannel):
-        """Joins a voice channel"""
+    async def join(self, ctx):
+        channel = ctx.message.author.voice.channel
 
-        if ctx.voice_client is not None:
-            return await ctx.voice_client.move_to(channel)
+        if channel is not None:
+            await channel.connect()
+        else:
+            await ctx.send("You must connect to a voice channel first")
 
-        await channel.connect()
+        
     
     @commands.command(name="pause", alieses=['resume'])
     async def pause(self, ctx):
