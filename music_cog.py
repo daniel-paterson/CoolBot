@@ -84,12 +84,12 @@ class MusicCog(commands.Cog):
     #commands
     #
 
-    @commands.command()
+    @commands.command(name="play", alieses=['p'])
     async def play(self, ctx, *, url):
         self.musicQueue.append(url) #add the song to the queue
         await ctx.message.add_reaction("✅")
 
-        if not ctx.voice_client.is_playing(): #if we aren't already playing stuff, start playing stuff
+        if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused(): #if we aren't already playing stuff, start playing stuff
             await self.playNext(ctx)
 
 
@@ -101,6 +101,16 @@ class MusicCog(commands.Cog):
             return await ctx.voice_client.move_to(channel)
 
         await channel.connect()
+    
+    @commands.command(name="pause", alieses=['resume'])
+    async def pause(self, ctx):
+        if not ctx.voice_client.is_paused():
+            ctx.voice_client.pause()
+            await ctx.message.add_reaction("⏸")
+        else:
+            ctx.voice_client.resume()
+            await ctx.message.add_reaction("▶")
+
 
 
     # @commands.command()
@@ -116,9 +126,8 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def stop(self, ctx):
-        """Stops and disconnects the bot from voice"""
-
         await ctx.voice_client.disconnect()
+        await ctx.message.add_reaction("🛑")
 
 
 
