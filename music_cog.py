@@ -147,11 +147,11 @@ class MusicCog(commands.Cog):
         await ctx.voice_client.disconnect()
         await ctx.message.add_reaction("🛑")
 
-    @commands.command()
+    @commands.command() #debug command, just plays, no fancy stuff
     async def justPlay(self, ctx, *, url):
         async with ctx.typing(): #play the music
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-                ctx.voice_client.play(player) #after playing, run this function again
+                ctx.voice_client.play(player)
             
         await ctx.send(f'Now playing: {player.title}')
 
