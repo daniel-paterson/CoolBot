@@ -5,7 +5,7 @@ from discord.ext import commands
 def sanitizeDice(dice):
         dice = ''.join(dice)
         dice.replace(" ", "")
-        dice = re.split('[dD+]', dice)
+        dice = re.split('[dD+]', dice) #god I love regex
         for i in range(len(dice)):
             dice[i] = int(dice[i])
         return dice
@@ -35,8 +35,9 @@ class ttrpgCog(commands.Cog):
     async def cog_unload(self):
         print(f"{self.__class__.__name__} unloaded!")
 
-    @commands.command() #used for ttrpgs and other stuff like that. TODO: add support for addition, ie "2d10 + 2" or "1d6 + 3d4 + 2"
+    @commands.command() #used for ttrpgs and other stuff like that
     async def roll(self, ctx, *args):
+        ctx.message.add_reaction("🎲")
         numbers, total = calcDice(args)
         await ctx.send(f'Numbers rolled: {numbers}\nTotal: {total}')
 

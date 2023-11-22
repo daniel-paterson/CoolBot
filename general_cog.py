@@ -20,7 +20,7 @@ class GeneralCog(commands.Cog):
         print(f"{self.__class__.__name__} unloaded!")
     
     @commands.Cog.listener()
-    async def on_load(self, ctx):
+    async def on_load(self):
         print("CoolBot is now online")
 
 

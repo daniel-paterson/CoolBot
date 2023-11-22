@@ -56,6 +56,8 @@ class MusicCog(commands.Cog):
         self.bot = bot
 
         self.musicQueue = []
+        self.isPlaying = False
+        self.isPaused = False
 
 
 
@@ -66,6 +68,7 @@ class MusicCog(commands.Cog):
     async def playNext(self, ctx):
         if len(self.musicQueue) > 0: #if there is music in the queue...
 
+            self.isPlaying = True
 
             url = self.musicQueue.pop() #remove the next song from the queue and store it
 
@@ -76,6 +79,7 @@ class MusicCog(commands.Cog):
             await ctx.send(f'Now playing: {player.title}')
 
         else: #if the queue is empty...
+            self.isPlaying = False
             await ctx.send("Reached end of music queue")
 
 
@@ -86,32 +90,44 @@ class MusicCog(commands.Cog):
 
     @commands.command(name="play", alieses=['p'])
     async def play(self, ctx, *, url):
+        print(f"Playing {url}")
         self.musicQueue.append(url) #add the song to the queue
         await ctx.message.add_reaction("✅")
 
-        if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused(): #if we aren't already playing stuff, start playing stuff
+        if not self.isPlaying: #if we aren't already playing stuff, start playing stuff
             await self.playNext(ctx)
 
 
     @commands.command()
     async def join(self, ctx):
-        voiceState = ctx.message.author.voice
+        voiceState = ctx.message.author.voice #gets the invoker's voice state
 
-        if not voiceState is None:
+        if not voiceState is None: #if they are in a channel, connect to it
             await voiceState.channel.connect()
-        else:
+        else: #if they are not in a channel, tell them off
             await ctx.send("You must connect to a voice channel first")
 
         
-    
     @commands.command(name="pause", alieses=['resume'])
     async def pause(self, ctx):
         if not ctx.voice_client.is_paused():
             ctx.voice_client.pause()
+            self.isPaused = True
             await ctx.message.add_reaction("⏸")
         else:
             ctx.voice_client.resume()
+            self.isPaused = False
             await ctx.message.add_reaction("▶")
+    
+
+    @commands.command(name="skip", alieses=['s'])
+    async def skip(self, ctx):
+        if len(self.musicQueue) > 0:
+            await ctx.message.add_reaction("⏩")
+            self.musicQueue.pop()
+            await self.playNext(ctx)
+        else:
+            await ctx.send("I can't skip the music if there's no music to skip!")
 
 
 
@@ -130,6 +146,14 @@ class MusicCog(commands.Cog):
     async def stop(self, ctx):
         await ctx.voice_client.disconnect()
         await ctx.message.add_reaction("🛑")
+
+    @commands.command()
+    async def justPlay(self, ctx, *, url):
+        async with ctx.typing(): #play the music
+                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                ctx.voice_client.play(player) #after playing, run this function again
+            
+        await ctx.send(f'Now playing: {player.title}')
 
 
 
