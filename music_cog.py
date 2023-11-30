@@ -57,7 +57,6 @@ class MusicCog(commands.Cog):
         self.bot = bot
 
         self.musicQueue = []
-        self.isPlaying = False
         self.isPaused = False
 
 
@@ -69,7 +68,6 @@ class MusicCog(commands.Cog):
     async def playNext(self, ctx):
         if len(self.musicQueue) > 0: #if there is music in the queue...
 
-            self.isPlaying = True
 
             url = self.musicQueue.pop() #remove the next song from the queue and store it
 
@@ -80,7 +78,6 @@ class MusicCog(commands.Cog):
             await ctx.send(f'Now playing: {player.title}')
 
         else: #if the queue is empty...
-            self.isPlaying = False
             await ctx.send("Reached end of music queue")
 
 
@@ -95,9 +92,18 @@ class MusicCog(commands.Cog):
         self.musicQueue.append(url) #add the song to the queue
         await ctx.message.add_reaction("✅")
 
-        if not self.isPlaying: #if we aren't already playing stuff, start playing stuff
+        if not ctx.voice_client.is_playing(): #if we aren't already playing stuff, start playing stuff
             await self.playNext(ctx)
 
+    @commands.command()
+    async def queue(self, ctx):
+        n = 1
+        for i in self.musicQueue:
+            if n < 10:
+                await ctx.send(f"Position {n}: {i}")
+                n += 1
+            else:
+                break
 
     @commands.command()
     async def join(self, ctx):
@@ -125,7 +131,7 @@ class MusicCog(commands.Cog):
     async def skip(self, ctx):
         if len(self.musicQueue) > 0:
             await ctx.message.add_reaction("⏩")
-            self.musicQueue.pop()
+            ctx.voice_client.stop()
             await self.playNext(ctx)
         else:
             await ctx.send("I can't skip the music if there's no music to skip!")
@@ -170,8 +176,8 @@ class MusicCog(commands.Cog):
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
+        # elif ctx.voice_client.is_playing():
+        #     ctx.voice_client.stop()
     
 
     async def cog_load(self):
