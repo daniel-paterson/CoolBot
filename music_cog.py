@@ -58,6 +58,7 @@ class MusicCog(commands.Cog):
 
         self.musicQueue = []
         self.isPaused = False
+        self.looping = False
 
 
 
@@ -68,8 +69,10 @@ class MusicCog(commands.Cog):
     async def playNext(self, ctx):
         if len(self.musicQueue) > 0: #if there is music in the queue...
 
-
-            url = self.musicQueue.pop() #remove the next song from the queue and store it
+            if self.looping:
+                url = self.musicQueue[0] #get the next song in the queue, dont remove it
+            else:
+                url = self.musicQueue.pop() #remove the next song from the queue and store it
 
             async with ctx.typing(): #play the music
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
@@ -135,14 +138,22 @@ class MusicCog(commands.Cog):
 
     @commands.command(name="skip", alieses=['s'])
     async def skip(self, ctx):
+        await ctx.message.add_reaction("⏩")
+        ctx.voice_client.stop()
         if len(self.musicQueue) > 0:
-            await ctx.message.add_reaction("⏩")
-            ctx.voice_client.stop()
             await self.playNext(ctx)
+
+
+    @commands.command()
+    async def loop(self, ctx):
+        self.looping = not self.looping
+
+        if self.looping:
+            await ctx.message.add_reaction("🔁")
+            await ctx.send("Looping is now on")
         else:
-            await ctx.send("I can't skip the music if there's no music to skip!")
-
-
+            await ctx.message.add_reaction("➡")
+            await ctx.send("Looping is now off")
 
     @commands.command()
     async def stop(self, ctx):
