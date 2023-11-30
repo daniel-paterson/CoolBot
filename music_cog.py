@@ -104,6 +104,12 @@ class MusicCog(commands.Cog):
                 n += 1
             else:
                 break
+    
+    @commands.command()
+    async def clear(self, ctx):
+        self.musicQueue.clear()
+        await ctx.message.add_reaction("👋")
+        await ctx.send("Queue has been cleared")
 
     @commands.command()
     async def join(self, ctx):
@@ -136,17 +142,6 @@ class MusicCog(commands.Cog):
         else:
             await ctx.send("I can't skip the music if there's no music to skip!")
 
-
-
-    # @commands.command()
-    # async def volume(self, ctx, volume: int):
-    #     """Changes the player's volume"""
-
-    #     if ctx.voice_client is None:
-    #         return await ctx.send("Not connected to a voice channel.")
-
-    #     ctx.voice_client.source.volume = volume / 100
-    #     await ctx.send(f"Changed volume to {volume}%")
 
 
     @commands.command()
