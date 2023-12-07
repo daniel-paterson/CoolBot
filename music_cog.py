@@ -1,4 +1,5 @@
-import discord, asyncio
+import discord, asyncio, waiting
+from waiting import wait
 from discord.ext import commands
 import yt_dlp
 
@@ -66,24 +67,27 @@ class MusicCog(commands.Cog):
     #non-command functions
     #
         
-    async def playNext(self, ctx):
-        if len(self.musicQueue) > 0: #if there is music in the queue...
 
-            if self.looping:
-                url = self.musicQueue[0] #get the next song in the queue, dont remove it
-            else:
-                url = self.musicQueue.pop() #remove the next song from the queue and store it
+
+    async def playNext(self, ctx):
+
+        if len(self.musicQueue) > 0: #if there is music in the queue...
+            print("entered playNext's stuff in queue bit")
+
+            # if self.looping:
+            #     url = self.musicQueue[0] #get the next song in the queue, dont remove it
+            # else:
+            url = self.musicQueue.pop() #remove the next song from the queue and store it
 
             async with ctx.typing(): #play the music
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-                ctx.voice_client.play(player, after=await self.playNext(ctx)) #after playing, run this function again
+                print(f"playing {url}")
+                await ctx.voice_client.play(player, after=lambda e: self.playNext(ctx)) #after playing, run this function again
             
             await ctx.send(f'Now playing: {player.title}')
 
         else: #if the queue is empty...
             await ctx.send("Reached end of music queue")
-
-
 
     #
     #commands
@@ -91,7 +95,7 @@ class MusicCog(commands.Cog):
 
     @commands.command(name="play", alieses=['p'])
     async def play(self, ctx, *, url):
-        print(f"Playing {url}")
+        print(f"Queued {url}")
         self.musicQueue.append(url) #add the song to the queue
         await ctx.message.add_reaction("✅")
 
